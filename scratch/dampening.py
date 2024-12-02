@@ -1,5 +1,27 @@
-import sys
 from itertools import tee
+report = [7, 6, 4, 2, 1]
+
+# def test_safeness(use_dampening = False):
+#     is_asc_sorted = report == sorted(report)
+#     is_desc_sorted = report == sorted(report, reverse=True)
+#     is_asc_or_desc = is_asc_sorted or is_desc_sorted
+    
+#     if not is_asc_or_desc:
+#         print(f"    UNSAFE: {report} is neither strictly ascending or descending")
+#         return False
+
+#     # Now do the pairwise assessment of the gaps in each item
+#     a, b = tee(report, 2)
+#     next(b, None)
+    
+#     unsafe = [ abs(a - b) for a, b in zip(a, b) if abs(a - b) < 1 or abs(a - b) > 3]
+#     print(f"Unsafe pairs: {len(unsafe)}")
+    
+#     if len(unsafe) > 0:
+#         safe_with_dampening = test_safeness_with_problem_dampening(report)
+        
+#     print("    SAFE")
+#     return True
 
 def is_report_safe(report):
     # Build variations of the report with one item missing
@@ -26,33 +48,16 @@ def is_variation_safe(variation):
         return False
     
     # Test Gaps
-    a, b = tee(variation, 2)
+    a, b = tee(report, 2)
     next(b, None)
     
     # Now do the pairwise assessment of the gaps in each item
-    a, b = tee(variation, 2)
+    a, b = tee(report, 2)
     next(b, None)
     unsafe = [ abs(a - b) for a, b in zip(a, b) if abs(a - b) < 1 or abs(a - b) > 3 ]
     
     if unsafe:
         return False
     
-    return True    
+    return True
     
-def solve(filename):
-    """
-    Load up a list of reports (lists), and pass each report through `test_report`.
-    `test_report` returns True if the report is "safe", and False if it is "Unsafe"
-    So all you have to do is count the number of "True" values in the list.
-    """
-    reports = [[int(i) for i in row.strip().split(" ")] for row in open(filename)]
-    total_count = [is_report_safe(report) for report in reports].count(True)
-    print(f"Total Safe Reports: {total_count}")
-    
-if __name__ == '__main__':
-    lower_args = [arg.lower() for arg in sys.argv]
-    filename = "test_input" if "t" in lower_args else "input"
-    solve(filename)
-    
-    if "advent" in lower_args:
-        write_advent()
