@@ -56,6 +56,7 @@ def solve(filename):
         sim_total += v * factor
     
     print(sim_total)
+    
 if __name__ == '__main__':
     filename = "test_input" if len(sys.argv) > 1 and sys.argv[1].lower() == "t" else "input"
     solve(filename)
