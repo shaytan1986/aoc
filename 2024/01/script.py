@@ -36,12 +36,6 @@ def solve(filename):
 
     print(sum(abs(first_values - second_values)))
 
-    
-    # for a, b in items:
-    #     distance = abs(a - b)
-    #     print(f"[{i}]: abs({a} - {b}) = {distance}")
-    #     i += 1
-    
 
 if __name__ == '__main__':
     filename = "test_input" if len(sys.argv) > 1 and sys.argv[1].lower() == "t" else "input"
