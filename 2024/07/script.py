@@ -3,31 +3,68 @@ import numpy as np
 from pprint import pprint as pp
     
 def solve(filename, **kwargs):
-    data =  [ list(i.strip()) for i in open(filename).readlines() ]
+    """
+    We have a 2D array of characters and we need to get all possible 4-length strings.
     
+    So we parse the file input as a 2D array and then loop over every cell getting the matches
+        adjacent to that cell.
+    
+    It's not the most elegant solution, but it does work.
+    
+    I also allowed this function to be parameterized with a dictionary which says which checks you
+        actually want to run. That's only useful for debugging, butt ust so you know what it is.
+    """
+    # Parse file as a 2d array
+    data = [ list(i.strip()) for i in open(filename).readlines() ]
+    
+    # We'll build this up with checks
     checks = []
+    
+    # Since I need to pass indexes to `get_cell_matches` I'm iterating them here
     irow = 0
+    # Loop over rows
     for row in data:
+        # We could add directly to `checks` but during debugging it was easier to have an intermediate list
         row_checks = []
         icell = 0
+        # loop over cells
         for cell in row:
             new_checks = get_cell_matches(irow, icell, data, **kwargs)
+            # As long as we got _some_ matches, append them to `row_checks`
             if new_checks:
                 # Really this should be addition, but I want them broken out for now
                 row_checks += new_checks
             icell += 1
-        print(row_checks)
+        # append all the checks from the current row to the total list
         checks += row_checks
-        # checks.append(row_checks)
         irow += 1
         
-    pp(len(checks))
+    pp(f"Number of Matching Checks: {len(checks)}")
     # pp(len([ c for c in checks if c.lower() == 'xmas' ]))
         
 def get_cell_matches(irow, icell, data, **kwargs):
+    """
+    This function takes a set of x,y coords, the raw data, and an optional **kwargs indicating which 
+        checks to actually run. That last one is really only useful for debugging.
+        
+    So for every single cell, I'm checking in all the cardinal directions
+    * Up
+    * Up-Right
+    * Right
+    * Down-Right
+    * Down
+    * Down-Left
+    * Left
+    * Up-Left
     
+    Anything that says "XMAS" then gets output for consumption by the outer method.
+    """
+    
+    # Figure out which tests to run
+    # By default, everything
     if not kwargs:
         do_u, do_ur, do_r, do_dr, do_d, do_dl, do_l, do_ul = True, True, True, True, True, True, True, True
+    # If anything is passed, default everything to false.
     else:
         do_u = kwargs.get('u', False)
         do_ur = kwargs.get('ur', False)
@@ -117,7 +154,7 @@ def get_cell_matches(irow, icell, data, **kwargs):
     
 if __name__ == '__main__':
     # Controls which directions to look. Mostly for debugging
-    # TESTED: l, r, u, d, ur, ul, dl
+
     kwargs = {
         "u": False,
         "ur": False,
