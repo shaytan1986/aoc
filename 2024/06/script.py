@@ -8,19 +8,26 @@ def mul(x,y):
     return x * y
 
 def compute_line(line):
+    """
+    This is a really good pattern to remember. We used it in CSV Parsers as well.
+    
+    Loop through a bunch of symbols. 
+    If the symbol is a special symbol, set whatever flags are necessary
+    If it is not a special symbol (default) process the symbol, with all the currently set flags
+    
+    
+    """
     result = 0
     active = True
     
-    matches = rgx.findall(line)
-    for match in matches:
+    for match in rgx.findall(line):
         if match == "do()":
             active = True
         elif match == "don't()":
             active = False
-        else:
-            if active:            
-                product = int(eval(match))
-                result += product
+        elif active:
+            product = int(eval(match))
+            result += product
     return result
     
 def solve(filename = "test_input"):
