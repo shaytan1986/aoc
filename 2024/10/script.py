@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+from functools import cmp_to_key
 
 def solve(filename):
     ## Pre-process these as integers
@@ -19,8 +20,9 @@ def solve(filename):
     
     result = 0
     for update in updates:
-        if is_in_right_order(rules, update):
-            middle_item = get_middle_item(update)
+        if not is_in_right_order(rules, update):
+            ordered_update = make_ordered(rules, update)
+            middle_item = get_middle_item(ordered_update)
             result += middle_item
     print(f"There are {result} correct updates")
     
@@ -52,6 +54,19 @@ def is_in_right_order(rules, update):
     print(msg)
     return correct
     
+def make_ordered(rules, update: list):
+    def comparator(a, b):
+        a_must_come_last_rules = rules[rules[:,1] == a][:,0]
+        b_must_come_last_rules = rules[rules[:,1] == b][:,0]
+        
+        if b in a_must_come_last_rules:
+            return -1
+        elif a in b_must_come_last_rules:
+            return 1
+        else:
+            return 0
+        
+    return sorted(update, key=cmp_to_key(comparator))
     
     
 if __name__ == '__main__':
