@@ -68,9 +68,7 @@ def check_kernel(irow, icell, data):
     
     return False
         
-    
-    
-    
+
 if __name__ == "__main__":
     filename = "test_input" if "t" in sys.argv else "input"
     solve(filename)
