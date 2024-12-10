@@ -1,4 +1,3 @@
-# OOPS! I accidentally overwrote my original solution to this.
 import sys
 import numpy as np
 from pprint import pprint as pp
@@ -16,7 +15,7 @@ class Coord:
             return True
         if self.icol < 0:
             return True
-        if self.icol > len(map[0]):
+        if self.icol >= len(map[0]):
             return True
         return False
     
@@ -24,7 +23,8 @@ class Coord:
         return Coord(self.irow + tup[0], self.icol + tup[1])
 
     def is_wall(self, map):
-        return map[self.irow][self.icol] == '#'
+        value = map[self.irow][self.icol] 
+        return value == '#'
 
 # If the dude is facing one of these directions, this shows where you move him
 # If he's facing up, each step will reduce his row by 1
@@ -47,7 +47,7 @@ def get_next_direction(direction):
 
 direction = UP
 position = Coord(0, 0)
-original_guard_position = Coord(0, 0)
+
 def solve(filename):
     map = [ list(a.strip()) for a in open(filename) ]
     direction = UP
@@ -68,11 +68,11 @@ def solve(filename):
             position = next_position
 
     # Run 
-    total_loops = find_loops(original_guard_position, map)
-    print(total_loops)
-    print(count_guard_squares(map))
+    total_loops = find_loops(map, original_guard_position)
+    print(f"Total Loops: {total_loops}")
+    print(f"Total Guard Positions: {count_guard_squares(map)}")
     
-def find_loops(solved_map):
+def find_loops(solved_map, original_guard_position):
     candidates = []
     irow = 0
     for row in solved_map:
@@ -92,36 +92,61 @@ def find_loops(solved_map):
                 
     total_loops = 0
     
+    sim_num = 0
     for candidate in candidates:
+        print(f" ** SIMULATION {sim_num} **")
         # Copy the map, with the modified obstruction
         sim_map = deepcopy(solved_map)
         sim_map[candidate.irow][candidate.icol] = "#"
-        if check_simulation_results_in_loop(sim_map):
+        if check_simulation_results_in_loop(sim_map, original_guard_position, sim_num):
             total_loops += 1
+        sim_num += 1
             
     return total_loops
             
-def check_simulation_results_in_loop(map):
+def check_simulation_results_in_loop(map, original_guard_position, sim_num):
     guard_direction = UP
     guard_position = Coord(original_guard_position.irow, original_guard_position.icol)
+    original_irow = original_guard_position.irow
+    original_icol = original_guard_position.icol
     
     is_circular = False
+    i = 0
+    circ_ct = 0
+    visit_ct = {}
     while True:
-        map[guard_position.irow][guard_position.icol] = "o"
+        guard_tuple = (guard_position.irow, guard_position.icol)
+        map[guard_position.irow][guard_position.icol] = "@"
         next_position = guard_position.move(guard_direction)
-        next_value = map[next_position.irow][next_position.icol]
+        new_value = visit_ct.get(guard_tuple, 0) + 1
+        visit_ct[guard_tuple] = new_value
         
-        pp(map)
+        # if sim_num == 31:
+        #     print(f"[{sim_num}][{i}]")
+        #     print(f"Guard: ({guard_position.irow}, {guard_position.icol})")
+        #     print(f"Next: ({next_position.irow}, {next_position.icol})")
+        #     print(f"Cir Ct: {circ_ct}")
+        #     pp(map)
+        #     print("\n")
+        map[guard_position.irow][guard_position.icol] = "o"
+        # pp(map)
         if next_position.is_oob(map):
             is_circular = False
             break
+        elif visit_ct.get(guard_tuple, 0) > 4:
+            # circ_ct += 1
+            # if next_position.is_wall(map):
+            #     guard_direction = get_next_direction(guard_direction)
+            # else:
+            #     guard_position = next_position
+            # if circ_ct > 4:
+            return True
         elif next_position.is_wall(map):
-            guard_direction = get_next_direction(direction)
-        elif next_value == 'o':
-            is_circular = True
-            break
+            guard_direction = get_next_direction(guard_direction)
         else:
             guard_position = next_position
+            
+        i += 1
         
     return is_circular
 
