@@ -1,8 +1,6 @@
-# OOPS! I accidentally overwrote my original solution to this.
 import sys
 import numpy as np
 from pprint import pprint as pp
-from copy import deepcopy
 
 class Coord:
     def __init__(self, irow, icol):
@@ -46,15 +44,12 @@ def get_next_direction(direction):
         return UP
 
 direction = UP
-position = Coord(0, 0)
-original_guard_position = Coord(0, 0)
+position = (0, 0)
 def solve(filename):
     map = [ list(a.strip()) for a in open(filename) ]
     direction = UP
     position = get_guard_coord(map)
-    # DON'T CHANGE THIS. It's going to be used to start simulations
-    original_guard_position = get_guard_coord(map)
-    # Solves the first part of the puzzle
+
     while True:
         map[position.irow][position.icol] = "X"
         next_position = position.move(direction)
@@ -67,64 +62,7 @@ def solve(filename):
         else:
             position = next_position
 
-    # Run 
-    total_loops = find_loops(original_guard_position, map)
-    print(total_loops)
     print(count_guard_squares(map))
-    
-def find_loops(solved_map):
-    candidates = []
-    irow = 0
-    for row in solved_map:
-        icol = 0
-        for col in solved_map[irow]:
-            
-            if (irow, icol) == (original_guard_position.irow, original_guard_position.icol):
-                pass
-            ## I don't actually know if this is necessary/desirable
-            # I might need to consider spots that aren't on the original path
-            elif col == "X":
-                candidates.append(Coord(irow, icol))
-            
-            icol += 1
-        irow += 1
-                
-                
-    total_loops = 0
-    
-    for candidate in candidates:
-        # Copy the map, with the modified obstruction
-        sim_map = deepcopy(solved_map)
-        sim_map[candidate.irow][candidate.icol] = "#"
-        if check_simulation_results_in_loop(sim_map):
-            total_loops += 1
-            
-    return total_loops
-            
-def check_simulation_results_in_loop(map):
-    guard_direction = UP
-    guard_position = Coord(original_guard_position.irow, original_guard_position.icol)
-    
-    is_circular = False
-    while True:
-        map[guard_position.irow][guard_position.icol] = "o"
-        next_position = guard_position.move(guard_direction)
-        next_value = map[next_position.irow][next_position.icol]
-        
-        pp(map)
-        if next_position.is_oob(map):
-            is_circular = False
-            break
-        elif next_position.is_wall(map):
-            guard_direction = get_next_direction(direction)
-        elif next_value == 'o':
-            is_circular = True
-            break
-        else:
-            guard_position = next_position
-        
-    return is_circular
-
 
 def count_guard_squares(map):
     return sum([ row.count("X") for row in map ])
