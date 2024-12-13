@@ -5,8 +5,9 @@ def solve(filename):
     input_lines = 0
     solvable_equation_count = 0
     for puzzle_line in get_puzzle_input(filename):
-        if process_puzzle_line(puzzle_line, input_lines):
-            solvable_equation_count += 1
+        is_solvable, result = process_puzzle_line(puzzle_line, input_lines)
+        if is_solvable:
+            solvable_equation_count += result
         input_lines += 1
             
     print(f"{solvable_equation_count} of {input_lines} equations are solvable.")
@@ -30,21 +31,23 @@ def process_puzzle_line(puzzle_line, line_id):
     operand_slots = len(operands) - 1
     operator_sets = product(["+", "*"], repeat=operand_slots)
     op_set_id = 0
+
     for op_set in operator_sets:
-        if check_operator_set(total, operands, op_set, line_id, op_set_id):
-            return True
+        is_solvable, result = check_operator_set(total, operands, op_set, line_id, op_set_id)
+        if is_solvable:
+            return (is_solvable, result)
         op_set_id += 1
         
     # print(f'operands: {operands}')
     # print(f'operand_slots: {operand_slots}')
-    return False
+    return (False, 0)
 
 def check_operator_set(total, operands, operator_set, line_id, op_set_id):
     """Test if a specific configuration of operators satisfies the total"""
-    print(f" ** [{line_id}][{op_set_id}] **")
-    print(f'    total: {total}')
-    print(f'    operands: {operands}')
-    print(f'    operator_set: {operator_set}')
+    # print(f" ** [{line_id}][{op_set_id}] **")
+    # print(f'    total: {total}')
+    # print(f'    operands: {operands}')
+    # print(f'    operator_set: {operator_set}')
     
     running_total = operands[0]
     operator_id = 0
@@ -58,21 +61,21 @@ def check_operator_set(total, operands, operator_set, line_id, op_set_id):
         # print(f'next_operand: {next_operand}')
         # print(f'operator: {operator}')
         running_total = int(eval(eval_str))
-        print(f'    eval_str: {eval_str} = {running_total}')
+        # print(f'    eval_str: {eval_str} = {running_total}')
         
         operator_id += 1
         
     retval = False
     if running_total == total:
-        print(f"    Correct!")
-        print(f'    operands: {operands}')
-        print(f'    operator_set: {operator_set}')
+        # print(f"    Correct!")
+        # print(f'    operands: {operands}')
+        # print(f'    operator_set: {operator_set}')
         retval = True
     else:
-        print(f"    Incorrect!")
-        print(f"    Total = {running_total}")
+        # print(f"    Incorrect!")
+        # print(f"    Total = {running_total}")
         retval = False
-    return retval
+    return (retval, total)
         
 def pairwise(iterable):
     a, b = tee(iterable)
